@@ -11,25 +11,18 @@ function Dashboard() {
   const [items, setItems] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // const fetchUserName = async () => {
-  //   try {
-  //     const query = await db
-  //       .collection("users")
-  //       .where("uid", "==", user?.uid)
-  //       .get();
-  //     const data = await query.docs[0].data();
-  //     setName(data.name);
-  //   } catch (err) {
-  //     console.error(err + "error from fetchuser");
-  //   }
-  // };
+  //cart
+  const [cart,setCart]= useState([]);
+  const [page,setPage]= useState('items');
 
-  // useEffect(() => {
-  //   if (loading) return;
-  //   if (!user) return history.replace("/");
+  const addToCart =(item) => {
+    console.log("hello");
+      setCart([...cart,{...item}]);
+  };
+  const removeFromCart =(productToRemove)=>{
+    setCart(cart.filter(product=>product !== productToRemove ))
 
-  //   fetchUserName();
-  // }, [user, loading]);
+  };
 
   useEffect(() => {
     fetch("/products")
@@ -44,37 +37,62 @@ function Dashboard() {
       )
   }, [])
 
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  } else if (!isLoaded) {
-    return <div>Loading...</div>;
-  } else {
+
+  const navigateTo =(nextPage)=>{
+    setPage(nextPage);
+  }
+
+  const renderItems = () => (
+    <>
+   
+      <ul>
+        {items.map((item,idx) => (
+          <div key={idx}>
+           <h4> {item.title}</h4>
+           <h4> {item.price}</h4>
+            <button onClick={()=>addToCart(item)}>Add to cart</button>
+          </div>    
+                
+        ))}
+      
+      </ul> 
+  
+       </>  
+  )
+
+ 
+  const renderCart = () => (
+    <>
+   
+      <ul>
+        {cart.map((item,idx) => (
+          <div key={idx}>
+           <h4> {item.title}</h4>
+           <h4> {item.price}</h4>
+            <button onClick={()=>removeFromCart(item)}>Remove</button>
+          </div>    
+                
+        ))}
+      
+      </ul> 
+  
+       </>  
+  )
+
+ 
     return (
 
-      <div className="dashboard">       
-        {/* <div className="">
-          Logged in as
-          <div>{name}</div>
-          <div>{user?.email}</div>
-          <button className="" onClick={logout}>
-            Logout
-          </button>
-        </div> */}
-
-
-        <ul>
-          {items.map(item => (
-            <li >
-              {item.title} {item.price}
-              <button>Add to cart</button>
-            </li>          
-          ))}
-        </ul>
+      <div className="dashboard">   
+      <button onClick={() =>navigateTo('cart')}>Go to cart ({cart.length})</button> 
+      <button onClick={() =>navigateTo('items')}>Items</button> 
+      {page === 'items' && renderItems()}  
+      {page === 'cart' && renderCart()}  
+    
       </div>
 
     );
   }
-}
+
 
 
 export default Dashboard;
